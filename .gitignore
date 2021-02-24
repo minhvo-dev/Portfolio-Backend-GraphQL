@@ -1,0 +1,8 @@
+# node modules
+node_modules
+
+# enviroment variables
+.env
+
+# eslint config
+.eslint*
