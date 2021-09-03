@@ -16,16 +16,16 @@ app.use(express.json());
 // extract the token
 app.use(middleware.tokenExtractor);
 
+// health check
+app.use("/health", (_req, res) => {
+  res.send("ok");
+});
+
 app.use("/", graphqlHTTP({
   schema,
   rootValue: resolvers,
   graphiql: true
 }));
-
-// health check
-app.use("/health", (_req, res) => {
-  res.send("ok");
-});
 
 // unknown endpoint
 app.use(middleware.unknownEndpoint);
