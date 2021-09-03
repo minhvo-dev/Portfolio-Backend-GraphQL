@@ -22,6 +22,11 @@ app.use("/", graphqlHTTP({
   graphiql: true
 }));
 
+// health check
+app.use("/health", (_req, res) => {
+  res.send("ok");
+});
+
 // unknown endpoint
 app.use(middleware.unknownEndpoint);
 // error handler

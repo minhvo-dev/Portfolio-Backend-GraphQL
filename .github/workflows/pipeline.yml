@@ -1,0 +1,39 @@
+name: Deployment pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize]
+
+jobs:
+  deployment_pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: deploy to heroku
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: 'aqueous-scrubland-74133'
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          healthcheck: https://aqueous-scrubland-74133.herokuapp.com/health
+          checkstring: 'ok'
+          rollbackonhealthcheckfailed: true
+      - name: discord notification - success
+        uses: Ilshidur/action-discord@0.3.2
+        if: ${{ github.event_name == 'push' && success() }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_EMBEDS: "[{\"author\":{\"name\":\"${{github.event.head_commit.author.name}}\",\"url\":\"${{github.event.sender.html_url}}\",\"icon_url\":\"${{github.event.sender.avatar_url}}\"},\"description\":\"[${{github.event.head_commit.id}}](${{github.event.head_commit.url}}) ${{github.event.head_commit.message}}\",\"allowed_mentions\":{\"parse\":[\"everyone\"]},\"footer\":{\"text\":\"Woah! *So cool!* :100: :100: :100:\",\"icon_url\":\"https://img.icons8.com/emoji/96/000000/check-mark-emoji.png\"}}]"
+      - name: discord notification - failure
+        uses: Ilshidur/action-discord@0.3.2
+        if: ${{ github.event_name == 'push' && failure() }}
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_EMBEDS: "[{\"author\":{\"name\":\"${{github.event.head_commit.author.name}}\",\"url\":\"${{github.event.sender.html_url}}\",\"icon_url\":\"${{github.event.sender.avatar_url}}\"},\"description\":\"[${{github.event.head_commit.id}}](${{github.event.head_commit.url}}) ${{github.event.head_commit.message}}\",\"allowed_mentions\":{\"parse\":[\"everyone\"]},\"footer\":{\"text\":\"Oops! *Something wrong!* :bug: :tools:\",\"icon_url\":\"https://img.icons8.com/fluent/96/000000/error.png\"}}]"
