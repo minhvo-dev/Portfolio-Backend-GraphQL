@@ -5,6 +5,8 @@ module.exports = {
     apiKey: process.env.FIRESTORE_APIKEY,
     authDomain: process.env.FIRESTORE_AUTHDOMAIN,
     projectId: process.env.FIRESTORE_PROJECT_ID,
+    userEmail: process.env.FIREBASE_LOGIN_EMAIL,
+    userPassword: process.env.FIREBASE_LOGIN_PASSWORD
   },
   firestore: {
     collectionName: process.env.FIRESTORE_COLLECTION_NAME,
